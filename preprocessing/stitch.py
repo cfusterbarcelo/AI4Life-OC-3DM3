@@ -4,6 +4,9 @@ stitch.py
 Stitch 5D image tiles into stitched volumes using utils.py.
 Each scene is saved as a 5D OME-TIFF: [T, C, Z, Y, X].
 
+Author: @cfusterbarcelo
+Creation Date: 04/04/2025
+
 Usage:
     python preprocessing/stitch.py
 """
