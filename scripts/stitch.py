@@ -13,7 +13,7 @@ Usage:
 
 import os
 import tifffile
-from preprocessing import utils
+from scripts import utils
 
 DATA_DIR = "D:/Data/Spheroids-Data-OCProject/Individual_Images/Process"
 SAVE_DIR = "D:/Data/Spheroids-Data-OCProject/Individual_Images/stitched"
