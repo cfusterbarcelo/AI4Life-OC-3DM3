@@ -1,5 +1,5 @@
 # AI4Life-OC-3DM3
-Python tools for stitching, denoising (Noise2Void), and analyzing 5D microscopy data of tumor spheroids in collagen. Developed as part of the AI4Life Open Call 3 project.
+Python tools for stitching, denoising (Noise2Void), and analyzing 5D microscopy data of tumor spheroids in collagen. Developed as part of the AI4Life Open Call 3 project following directions of a previous open call project (see [here](https://github.com/ai4life-opencalls/oc-1-project-11/tree/main))
 
 ---
 
