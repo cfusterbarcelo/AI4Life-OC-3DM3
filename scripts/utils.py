@@ -30,8 +30,21 @@ TILE_OFFSETS = {
 }
 
 def reorder_to_tczyx(img):
-    """Convert [Z, T, C, Y, X] to [T, C, Z, Y, X] for OME-TIFF export."""
-    return img.transpose(1, 2, 0, 3, 4)
+    """
+    Reorder axes to [T, C, Z, Y, X].
+
+    Supports:
+    - 5D input [Z, T, C, Y, X]
+    - 4D input [Z, T, Y, X] (adds dummy channel)
+    """
+    if img.ndim == 5:  # [Z, T, C, Y, X]
+        return img.transpose(1, 2, 0, 3, 4)
+    elif img.ndim == 4:  # [Z, T, Y, X] → add C=1
+        img = img.transpose(1, 0, 2, 3)         # → [T, Z, Y, X]
+        img = img[:, np.newaxis, :, :, :]      # → [T, C=1, Z, Y, X]
+        return img
+    else:
+        raise ValueError(f"Unexpected input shape: {img.shape}")
 
 def load_tile(path):
     """Load a single 5D image tile and reorder axes."""
