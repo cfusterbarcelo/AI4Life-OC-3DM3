@@ -28,7 +28,19 @@ For alternate setups, refer to the [n2v installation guide](https://github.com/j
 
 ---
 
-## 2. Stitching Raw Tile Images
+## 2. Extract Tiles from the .CZI Files
+
+The individual raw tiles of the .czi files can be extracted to improve denoising of the indivdual images, stitching, and subsequently nuclei segmentation.  
+
+**File to run:**
+```
+extract_piles.py
+```
+Each tile is saved as a TIFF. 
+
+---
+
+## 3. Stitching Raw Tile Images
 
 We start with tile-based 5D microscopy data (2x2 grid).  
 Each tile is a TIFF file with shape (X, Y, Z, T, C).
@@ -43,7 +55,7 @@ This script loads each tile using known offsets and saves a single `.ome.tif` wi
 
 ---
 
-## 3. Preparing 2D+T Data for Denoising
+## 4. Preparing 2D+T Data for Denoising
 
 From the stitched 5D data, we extract the nuclei channel and perform a max Z-projection over central slices.  
 The result is a 3D (T, Y, X) stack, ready for denoising.
@@ -61,7 +73,7 @@ Where `{N}` is the number of projected slices.
 
 ---
 
-## 4. Denoising with Noise2Void
+## 5. Denoising with Noise2Void
 
 We use a Jupyter notebook to train a self-supervised N2V model and denoise each timepoint.
 
@@ -87,9 +99,9 @@ models/denoising_5slices_n2v/original-denoised-difference.png
 ```
 ---
 
-## 5. Annotating & Training Segmentation with Cellpose
+## 6. Annotating & Training Segmentation with Cellpose
 
-### 5.1 Manual Annotation (done using Cellpose GUI)
+### 6.1 Manual Annotation (done using Cellpose GUI)
 
 We extract individual timepoints from the denoised TIFF stack (done manually or with Fiji).  
 We then open selected frames in the **Cellpose GUI**, annotate them, and save masks as `_seg.npy`.
@@ -105,7 +117,7 @@ Repeat for 5–10 diverse timepoints.
 
 ---
 
-### 5.2 Training Custom Cellpose Model
+### 6.2 Training Custom Cellpose Model
 
 We use a batch file to launch training from these annotation pairs.
 
@@ -126,7 +138,7 @@ models/cellpose_nuclei_model/nuclei_custom/
 ```
 ---
 
-## 6. File Structure Overview
+## 7. File Structure Overview
 
 ```
 AI4Life-OC-3DM3/
