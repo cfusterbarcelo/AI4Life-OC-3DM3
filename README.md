@@ -94,6 +94,12 @@ models/denoising_5slices_n2v/original-denoised-difference.png
 We extract individual timepoints from the denoised TIFF stack (done manually or with Fiji).  
 We then open selected frames in the **Cellpose GUI**, annotate them, and save masks as `_seg.npy`.
 
+To annotate 3D images open cellpose GUI as:
+```
+python -m cellpose --Zstack
+```
+For more information on how to annotate images read [this docs](https://cellpose.readthedocs.io/en/latest/gui.html) and [this blog post](https://focalplane.biologists.com/2025/06/05/annotating-images-in-cellpose/).
+
 This produces training pairs like:
 
 ```
