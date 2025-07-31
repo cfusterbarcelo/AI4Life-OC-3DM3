@@ -1,115 +1,110 @@
-# AI4Life-OC-3DM3
+<p align="center">
+  <a href="https://ai4life.eurobioimaging.eu/open-calls/">
+    <img src="https://github.com/ai4life-opencalls/.github/blob/main/AI4Life_banner_giraffe_nodes_OC.png?raw=true" width="70%">
+  </a>
+</p>
 
-Python pipeline for stitching, denoising (Noise2Void), and segmenting migrating cells in 5D microscopy data (X, Y, Z, T, C) of tumor spheroids embedded in collagen.  
-Developed as part of the AI4Life Open Call 3 project, building on [OC-1 Project 11](https://github.com/ai4life-opencalls/oc-1-project-11/tree/main).
+# Project 18: 3D Matrix Motility Map (3DM³)
+
+**A collaboration with the Institute of Cell Biology and Immunology, University of Stuttgart, Germany**
 
 ---
 
-## 1. Environment Setup (Windows + NVIDIA GPU)
+## 🧠 Introduction
 
-This project uses:
+Cancer cell dissemination in 3D matrices is driven by interactions between cells and the extracellular matrix (ECM), especially collagen.  
+This project focuses on live-cell imaging of breast tumor spheroids embedded in collagen to analyze cancer cell migration, shape, and interaction with ECM architecture.
 
-- [Noise2Void (n2v)](https://github.com/juglab/n2v) for denoising  
-- [Cellpose](https://github.com/MouseLand/cellpose) for segmentation
+The dataset includes **5D live imaging (X, Y, Z, T, C)** acquired using widefield and confocal microscopy.  
+Channels include:
+- **Brightfield** (cell shape)
+- **mScarlet** (nuclear marker)
+- **Second Harmonic Generation (SHG)** (collagen structure)
 
-To replicate the GPU-enabled setup:
+Our aim is to develop a **reproducible pipeline** for:
+- Stitching tiled acquisitions
+- Denoising (via N2V or Careamics)
+- Manual annotation
+- Cellpose finetuning
+- Segmentation of migrating cells
 
-```
+
+## 🔧 Pipeline Overview
+
+### 1. Environment Setup
+
+To enable GPU acceleration on Windows:
+
+```bash
 conda env create -f n2v_env.yaml
 conda activate n2v
 ```
+For denoising, choose either:
+* `Noise2Void` (legacy, self-supervised)
+* ✅ [Careamics](https://careamics.github.io/0.1) (recommended, modular and modern implementation)
 
-This uses:
-- `tensorflow==2.10.1` (GPU)
-- `cudatoolkit=11.2`
-- `cudnn=8.1.0`
+### 2. Stitching Raw Tile Images 
+We begin with a 2x2 tile grid of 5D TIFF files (shape: X, Y, Z, T, C).
+Stitching is done using known positional offsets.
 
-For alternate setups, refer to the [n2v installation guide](https://github.com/juglab/n2v#installation).
-
----
-
-## 2. Stitching Raw Tile Images
-
-We start with tile-based 5D microscopy data (2x2 grid).  
-Each tile is a TIFF file with shape (X, Y, Z, T, C).
-
-We stitch them into a single 5D image using:
-
-**File to run:**  
+Run:
+```bash
+python stitch.py
 ```
-stitch.py
+
+**Output**:
+Single `.ome.tif` containing the full volume.
+
+### 3. Preparing 2D+T Slices for Denoising
+
+We extract the nuclei channel (mScarlet), and apply max Z-projection over central slices to obtain a 3D (T, Y, X) stack.
+
+**Run:**
+
+```bash
+python prepare_n2v.py
 ```
-This script loads each tile using known offsets and saves a single `.ome.tif` with full 5D dimensions preserved.
 
----
+### 4. Denoising
+You can denoise using:
 
-## 3. Preparing 2D+T Data for Denoising
-
-From the stitched 5D data, we extract the nuclei channel and perform a max Z-projection over central slices.  
-The result is a 3D (T, Y, X) stack, ready for denoising.
-
-**File to run:**  
-```
-prepare_n2v.py
-```
-Output is saved to:
-
-```
-data/n2v_input/{N}_slices/*.tif
-```
-Where `{N}` is the number of projected slices.
-
----
-
-## 4. Denoising with Noise2Void
-
-We use a Jupyter notebook to train a self-supervised N2V model and denoise each timepoint.
-
-**Notebook to open:**  
-```
+##### Option A: Jupyter Notebook with N2V
+Open:
+```bash
 notebooks/N2V_denoising.ipynb
 ```
-Steps:
-- Load projected 3D stack
-- Train N2V model using patch-based augmentation
-- Predict denoised output
-- Save denoised TIFF to disk
+Run the cells, specify where your dataset lies and denoise. Remember to install the environment. 
 
-Model is saved to:
-
+##### Option B: Jupyter Notebook with CAREamics (Recommended)
+Open:
+```bash
+CAREamics_denoising.ipynb
 ```
-models/denoising_5slices_n2v/
-```
-We also compute and save image difference plots:
+Again, run each cell and specify the dataset. This will need a different environment. 
+For any assistance, consult [CAREamics' documentation](https://careamics.github.io/0.1).
 
-```
-models/denoising_5slices_n2v/original-denoised-difference.png
-```
----
+Here you can see an image representing (from top to bottom) the original image, the image after being properly stitched and preprocessed and after denoising with CAREamics. 
 
-## 5. Annotating & Training Segmentation with Cellpose
+![Original Image - Preprocessed - Denoised](before-after.png)
 
-### 5.1 Manual Annotation (done using Cellpose GUI)
+### 5. Cell Annotation and Training
 
-We extract individual timepoints from the denoised TIFF stack (done manually or with Fiji).  
-We then open selected frames in the **Cellpose GUI**, annotate them, and save masks as `_seg.npy`.
-
-To annotate 3D images open cellpose GUI as:
-```
+#### 5.1 Manual Annotation
+Use the Cellpose GUI for annotation:
+```bash
 python -m cellpose --Zstack
 ```
-For more information on how to annotate images read [this docs](https://cellpose.readthedocs.io/en/latest/gui.html) and [this blog post](https://focalplane.biologists.com/2025/06/05/annotating-images-in-cellpose/).
 
-This produces training pairs like:
-
-```
+Save training pairs like:
+```text
 segmentation_input/training/
 ├── nuclei_t003.tif
 ├── nuclei_t003_seg.npy
 ```
-Repeat for 5–10 diverse timepoints.
 
----
+To have a consisten training of cellpose you will need to annotate between 15-20 nuclei per time-point and multiple time-points per scene. If not, there is not enough data to fine-tune cellpose. 
+
+For more information on how to annotate images read [this docs](https://cellpose.readthedocs.io/en/latest/gui.html) and [this blog post](https://focalplane.biologists.com/2025/06/05/annotating-images-in-cellpose/).
 
 ### 5.2 Training Custom Cellpose Model
 
@@ -130,37 +125,7 @@ Trained model is saved to:
 ```
 models/cellpose_nuclei_model/nuclei_custom/
 ```
----
 
-## 6. File Structure Overview
+**Acknowledgements**
 
-```
-AI4Life-OC-3DM3/
-│
-├── models/
-│   ├── denoising_5slices_n2v/
-│   │   ├── weights_best.h5
-│   │   └── original-denoised-difference.png
-│   └── cellpose_nuclei_model/
-│       └── nuclei_custom/
-│
-├── data/
-│   ├── raw/                           # Raw stitched tiles
-│   ├── n2v_input/                     # Projected TIFFs for N2V
-│   └── segmentation_input/
-│       └── training/                  # .tif + _seg.npy pairs
-│
-├── notebooks/
-│   └── N2V_denoising.ipynb
-│
-├── scripts/
-│   └── train_cellpose.bat
-│
-├── stitch.py
-├── prepare_n2v.py
-├── n2v_env.yaml
-└── README.md
-```
----
-
-Made by the OC-3DM³ team.
+AI4Life has received funding from the European Union’s Horizon Europe research and innovation programme under grant agreement number 101057970. Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or the European Research Council Executive Agency. Neither the European Union nor the granting authority can be held responsible for them.
