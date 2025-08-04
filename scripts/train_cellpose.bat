@@ -1,9 +1,10 @@
 @echo off
 echo Starting Cellpose training...
-call conda activate C:\Users\Caterina\anaconda3\envs\cellpose
+
+call conda activate C:\ProgramData\miniconda3\envs\cellpose
 
 cellpose --train ^
-  --dir D:/Data/Spheroids-Data-OCProject/Individual_Images/2d-denoised/training/ ^
+  --dir C:/Users/ac132194/Documents/Fiona_Data/Tiles/CAREamics-output/train/ ^
   --pretrained_model nuclei ^
   --chan 0 --chan2 0 ^
   --train_size ^

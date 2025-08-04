@@ -8,9 +8,10 @@ from skimage import exposure
 
 start = time.time()
 # ====== CONFIGURATION ======
-DATA_DIR = "D:/Data/Spheroids-Data-OCProject/Individual_Images/originals"
-# DATA_DIR = "Path/to/my/images"
-SAVE_DIR = "D:/Data/Spheroids-Data-OCProject/Individual_Images/preprocessed-by-tiles"
+#DATA_DIR = "D:/Data/Spheroids-Data-OCProject/Individual_Images/originals"
+DATA_DIR = "C:/Users/ac132194/Documents/Fiona_Data/Tiles"
+# SAVE_DIR = "D:/Data/Spheroids-Data-OCProject/Individual_Images/preprocessed-by-tiles"
+SAVE_DIR = "C:/Users/ac132194/Documents/Fiona_Data/Tiles"
 
 # Specify the axis order of the images after stitching (must match what your tiles have)
 AXIS_ORDER = "TZCYX"  # Options: "TCZYX", "TZYX", etc.
@@ -22,7 +23,7 @@ Z_NUM_SLICES = 7  # Number of slices to project (same for all)
 
 # Define starting Z-slice per scene (use the stitched scene name)
 Z_START_PER_SCENE = {
-    "l_2_2_20X-03-Scene-01": 10,
+    #"l_2_2_20X-03-Scene-01": 10,
     "l_2_2_20X-03-Scene-02": 17,
     "l_2_2_20X-03-Scene-03": 11,
     # Add more scenes here as needed

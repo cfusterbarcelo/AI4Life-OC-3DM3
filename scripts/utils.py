@@ -119,3 +119,33 @@ def process_for_n2v(input_path, output_path, channel_idx=0, num_slices=10):
     projected = max_project_middle_slices(channel, num_slices)  # [T, Y, X]
     tifffile.imwrite(output_path, projected.astype(np.uint16))
     print(f"✅ Saved: {output_path}")
+
+# -----------------------------
+# 📌 Miscellaneous
+# -----------------------------
+
+def get_random_slices(Z: int, 
+                      ROI_amount: int, 
+                      slices_per_img: int = 5
+                      ) -> dict[int, list]:
+    """
+    function to generate a random z-slice selection for individual timepoints
+    Z: amount of Z-slices of the picture
+    slices_per_img: thickness of the substack
+    timepoints: number of images per timepoint 
+
+    returns: dictionary in which timepoints readout the corresponding lowest z-plane
+    """
+
+    slices =  []
+
+    for tp in range(0, ROI_amount): 
+        if Z == 1:
+            slices.append([0, 0])
+        elif Z <= slices_per_img:
+            slices.append([0, Z])
+        elif Z > slices_per_img:
+            low = int(np.random.permutation(Z-slices_per_img)[:1][0])
+            slices.append([low, low + slices_per_img]) 
+        
+    return slices
