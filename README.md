@@ -4,7 +4,7 @@
   </a>
 </p>
 
-# Project 18: 3D Matrix Motility Map (3DM³)
+# Project 11: 3D Matrix Motility Map (3DM³)
 
 **A collaboration with the Institute of Cell Biology and Immunology, University of Stuttgart, Germany**
 
